@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>gridpass.io - Memorable Randomness</title>
+	<meta charset="UTF-8" />
+	<meta name="description" content="Generate passwords using image-based keypads" />
+	<meta name="author"		 content="Jason Hooper" />
+	<meta name="contact"	 content="nirgle@protonmail.com" />
+
+	<link rel="stylesheet"    href="https://fonts.googleapis.com/css?family=Open+Sans" type="text/css">
+	<link rel="stylesheet"    href="gridpass.css">
+	<link rel="shortcut icon" href="favicon.png">
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.3.10/seedrandom.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.20/angular.min.js"></script>
+	<script type="text/javascript" src="vendor/sha256.min.js"></script>
+	<script type="text/javascript" src="app/gridpass.js"></script>
+</head>
+
+<body ng-app="gridpassApp" ng-controller="GridPassCtrl as vm">
+
+	<!-- Pre-load the images -->
+	<div style="display: none">
+		<img src="img/market.jpg" />
+		<img src="img/machine.jpg" />
+		<img src="img/city.jpg" />
+		<img src="img/library.jpg" />
+		<img src="img/skyscraper.jpg" />
+		<img src="img/books.jpg" />
+	</div>
+
+	<div style="padding: 10px 20px; background-color: #2D3036; color: #999; font-size: 14pt; position: relative;">
+		<a href="" ng-click="vm.keypad()" style="color: #999;">gridpass.io</a>
+
+		<div style="position: absolute; left: 140px; top: 10px; color: #888888;">
+			<span ng-repeat="card in vm.cards | filter:{generated: true}"
+				  ng-class="{ active: card == vm.card }"
+				  style="padding-right: 10px;">{{ card.name + ' ' + card.x + ' ' + card.y }}</span>
+		</div>
+
+		<div style="position: fixed; right: 30px; top: 10px; color: #888888;">
+			{{ vm.choosing.name + ' ' + vm.choosing.x + ' ' + vm.choosing.y }}
+		</div>
+	</div>
+
+	<div style="position: relative;">
+
+		<!-- Tiles 100x100-->
+		<div style="position: absolute; left: 20px; top: 20px;">
+			<div ng-repeat="card in vm.cards" style="margin-bottom: 20px;">
+				<thumbnail card="card" z-index="2000" ng-click="vm.clickThumbnail(card.index)"></thumbnail>
+			</div>
+
+			<div ng-show="false && vm.cards.length == 6 && vm.cards[5].generated && vm.mode == 'keypad'">
+				<a href="" ng-click="vm.addSpace()" style="color: #333; font-size: 10pt;">Add space</a>
+			</div>
+		</div>
+
+		<div style="position: absolute; left: 140px; top: 20px; z-index: 3000; color: #CCC;"
+			 ng-show="vm.showSynopsis">
+
+			<div ng-repeat="card in vm.cards" style="margin-right: 15px; margin: bottom: 15px; float: left;">
+				<pixel-light card="card" z-index="2000"></pixel-light>
+			</div>
+
+			<br style="clear: both;" />
+
+			<div style="width: 500px;">
+				<p style="padding-top: 20px;">
+					Try to remember the location of this square precisely.
+					The passwords you derive from it will be lost if you forget, so make sure you can reliably select the same square when you see this image again.
+				</p>
+
+				<p>
+					The chance of guessing this precise {{ vm.cards.length > 1 ? 'sequence of squares' : 'square' }} is:
+				</p>
+
+				<p style="margin-left: 50px;">
+					<strong><big>1</big></strong> &nbsp; in &nbsp; <strong><big>{{ vm.entropy | number:0 }}</big></strong>
+				</p>
+
+				<p ng-show="vm.cards.length > 1">
+					<a href="" ng-click="vm.practice()">Click here to practice</a> keying in your <strong>{{ vm.cards.length }}-digit number</strong>.
+					The guidelines on the main image will gradually fade as you practice keying in your number.
+				</p>
+
+				<p ng-show="vm.cards.length < vm.imageCount">
+					<a href="" ng-click="vm.add()">Click here to generate</a> a point on the next image (6 in all).
+				</p>
+
+				<p ng-hide="vm.cards.length < vm.imageCount">
+					When you are confident you have memorized your number, click the <strong>gridpass.io</strong> logo at the top left to enter keypad entry mode.
+					After clicking through the six pictures, your passwords will be visible on screen.
+				</p>
+			</div>
+		</div>
+
+		<div ng-hide="vm.showSynopsis" style="position: absolute; left: 140px; top: 20px;">
+
+			<!-- The active image -->
+			<div ng-show="true" style="position: absolute; left: 0px; top: 0px;">
+
+				<grid-card card="vm.card" 
+						   z-index="2000"
+						   mode="vm.mode"
+						   confirm-generate="vm.confirmGeneratedCell()"
+						   keyed-in="vm.keyedIn()"
+						   choosing="vm.choosing"></grid-card>
+			</div>
+
+			<!-- Black pane fades out to fade in the active image -->
+			<div ng-show="vm.showInstructions"
+				 style="position: absolute; z-index: 2090; background-color: #000;"
+				 ng-style="{ opacity: (1 - vm.card.progress), width: vm.card.width+'px', height: vm.card.height+'px' }">
+			</div>
+
+			<!-- Instructional window -->
+			<div ng-show="vm.showInstructions"
+				 style="position: absolute; left: 0px; top: 0px; margin: 30px; z-index: 2100">
+
+				<div style="width: 500px; padding: 30px; color: white; background-color: #000; opacity: 0.8">
+
+					<span style="font-size: 15pt; font-weight: bold; color: #FF0;">
+						{{ vm.card.index + 1 }} of {{ vm.imageCount }} - {{ vm.card.description }}
+					</span>
+
+					<p>
+					Move the mouse around the screen as randomly as you can, and an image will fade into view
+					until this message window disappears. Then, find and click on the small lit-up square.
+					</p>
+
+					<p ng-show="vm.card.progress > 0">
+						{{ vm.card.progress * 100 | number:0 }} %
+					</p>
+				</div>
+			</div>
+
+			<!-- Scribbler surface -->
+			<div ng-show="vm.showScribbler" 
+				 style="position: absolute; z-index: 3000; left: 0px; top: 0px;"
+				 ng-style="{ width: vm.card.width + 'px', height: vm.card.height + 'px' }"
+				 ng-mousemove="vm.scribble($event.offsetX, $event.offsetY)">
+			</div>
+		</div>
+
+	</div>
+
+	<div ng-show="vm.passwordView" 
+		 style="position: absolute; z-index: 4000; left: 180px; top: 100px; background-color: black; px; padding: 40px;">
+
+		<password-view seed="vm.randomseed"></password-view>
+
+		<div style="margin-top: 120px; font-size: 11pt; color: #555;">
+			entropy: {{ vm.bits }} bits
+		</div>
+	</div>
+
+	<div ng-show="vm.mode == 'generate'" style="position: fixed; left: 140px; bottom: 10px;">
+		<small style="color: #444;">* Free stock photos found on google</small>
+	</div>
+
+</body>
+
+</html>
+

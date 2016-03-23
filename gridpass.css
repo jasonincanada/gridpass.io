@@ -1,0 +1,34 @@
+
+body {
+   background-color: #000;
+   margin: 0px;
+   font-family: 'Open Sans', sans-serif;
+}
+
+input[type="text"] {
+	font-family: 'Open Sans', sans-serif;
+	padding: 5px 0px 5px 10px;
+    background-color: black;
+	border-top: 0px;
+	border-left: 0px;
+	border-right: 0px;
+	border-bottom: solid 1px #243649;
+	margin-right: 30px;
+	color: #59799A;
+	font-size: 18pt;
+}
+
+.active {
+	color: #A5966B;
+}
+
+a:link,
+a:visited {
+	color: #739BC3;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #83ABD3;
+}
+

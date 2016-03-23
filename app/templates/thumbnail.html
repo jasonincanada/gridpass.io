@@ -1,0 +1,36 @@
+
+<div style="width: 100px; height: 100px; position: relative; margin: 0px;">
+
+	<!-- The image being tiled -->
+	<div style="position: absolute; width: 100px; height: 100px; left: 0px; top: 0px;"
+		 ng-style="{ zIndex: zIndex+0, background: 'url(img/' + card.src + ') ' + (-offset(card.x)) + 'px ' + (-offset(card.y)) + 'px' }"
+		 ng-show="card.generated">
+	</div>
+
+	<!-- Thumbnail white fence is always visible -->
+	<img src="img/white-panel-100.png"
+		 style="position: absolute; opacity: 0.6; left: 0px; top: 0px;"
+		 ng-style="{ zIndex: zIndex+2 }" />
+
+	<!-- Crosshairs -->
+	<img src="img/crosshairs-40.png" 
+		 ng-show="card.generated"
+		 style="position: absolute; opacity: 0.6;"
+		 ng-style="{ zIndex: zIndex+1, left: crosshairs(card.x)+'px', top: crosshairs(card.y)+'px' }" />
+
+	<!-- Square -->
+	<img src="img/white-10.png" 
+		 ng-show="card.generated"
+		 style="position: absolute; opacity: 0.8" 
+		 ng-style="{ zIndex: zIndex+2, left: square(card.x)+'px', top: square(card.y)+'px' }" />
+
+	<div style="position: absolute; width: 100px; height: 100px; left: 0px; top: 0px;"
+		 ng-style="{ zIndex: zIndex+9 }"
+		 ng-mousemove="moveHover($event.offsetX, $event.offsetY)">
+	</div>
+
+	<!-- Surface -->
+	<div style="position: absolute; left: 0px; top: 0px; width: 100px; height: 100px;"
+		 ng-style="{ zIndex: zIndex+1000 }" ></div>
+
+</div>

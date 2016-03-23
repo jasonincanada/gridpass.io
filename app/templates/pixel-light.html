@@ -1,0 +1,26 @@
+
+<!-- Directive: pixel-light -->
+<div style="position: relative;"
+	 ng-style="{ width: (card.width/5)+'px', height: (card.height/5)+'px' }">
+
+	<div style="position: absolute; left: 0px; top: 0px; margin: 0px;"
+		 ng-style="{ zIndex: zIndex }"
+		><img ng-src="img/{{ card.src  }}"
+			  alt="{{ card.description }}"
+			  ng-style="{ width: (card.width/5)+'px', height: (card.height/5)+'px' }" /></div>
+
+	<!-- Darkening layer -->
+	<div style="position: absolute; opacity: 0.5; left: 0px; top: 0px; margin: 0px; background-color: #000; border: 1px solid #444;"
+		 ng-style="{ zIndex: zIndex+1, width: (card.width/5)+'px', height: (card.height/5)+'px' }">
+	</div>
+
+	<!-- White panels -->
+	<div style="position: absolute; opacity: 0.3; width: 20px; height: 20px; margin: 0px; background-color: #FFF;"
+		 ng-style="{ left: (Math.floor(card.x/10)*20)+'px', top: (Math.floor(card.y/10)*20)+'px', zIndex: zIndex+2 }"></div>
+
+	<!-- White pixel -->
+	<div style="position: absolute; opacity: 1.0; width: 1px; height: 1px; margin: 0px; background-color: #FFF;"
+		 ng-style="{ left: (card.x*2)+'px', top: (card.y*2)+'px', zIndex: zIndex+3 }">
+	</div>
+</div>
+

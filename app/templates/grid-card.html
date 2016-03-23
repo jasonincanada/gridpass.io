@@ -1,0 +1,72 @@
+<div style="position: relative; margin: 0px;"
+	 ng-style="{ width: card.width+'px', height: card.height+'px' }">
+
+	<!-- The image being tiled -->
+	<div style="position: absolute; left: 0px; top: 0px;"
+		 ng-style="{ zIndex: zIndex+0, width: card.width+'px', height: card.height+'px', background: 'url(img/' + card.src + ')' }">
+	</div>
+
+	<!-- White fence -->
+	<img src="img/white-panel-100.png" 
+		 ng-show="card.generated"
+		 style="position: absolute;"
+		 ng-style="{ opacity: 1-card.fading, left: fence(card.x)+'px', top: fence(card.y)+'px', zIndex: zIndex+1 }" />
+
+	<!-- Selected crosshairs -->
+	<img src="img/crosshairs-40.png" 
+		 ng-show="card.generated"
+		 style="position: absolute;" 
+		 ng-style="{ zIndex: zIndex+1, opacity: 1-card.fading, left: card.x40, top: card.y40 }" />
+
+	<!-- Selected cell -->
+	<img src="img/white-10.png" 
+		 ng-show="card.generated"
+		 style="position: absolute;" 
+		 ng-style="{ zIndex: zIndex+1, opacity: 1-card.fading, left: (card.x*10)+'px', top: (card.y*10)+'px' }" />
+
+	<div style="position: absolute; left: 0px; top: 0px;"
+		 ng-style="{ width: card.width+'px', height: card.height+'px', zIndex: zIndex+9 }"
+		 ng-mousemove="moveHover($event.offsetX, $event.offsetY)">
+	</div>
+
+	<!-- The hover gizmo -->
+	<div style="position: absolute;"
+		 ng-style="{ left: hover.left+'px', top: hover.top+'px' }"
+		 ng-show="hover.hovering && (card.generated || mode == 'keypad')">
+
+		<div style="position: relative">
+
+			<!-- White fence -->
+			<img src="img/white-panel-100.png" 
+				 style="position: absolute; opacity: 0.8; left: 0px; top: 0px;"
+				 ng-style="{ zIndex: zIndex+1 }" />
+
+			<!-- Darkening layer -->
+			<img src="img/black-120.png" 
+				 style="position: absolute; opacity: 0.4; left: -10px; top: -10px;"
+				 ng-style="{ zIndex: zIndex+10 }" />
+
+			<!-- Crosshairs -->
+			<img src="img/crosshairs-40.png" 
+				 style="position: absolute; opacity: 0.6;" 
+				 ng-style="{ left: hover.crossLeft+'px', top: hover.crossTop+'px', zIndex: zIndex+12 }" />
+
+			<!-- Square -->
+			<img src="img/white-10.png" 
+				 style="position: absolute; opacity: 0.7;"
+				 ng-style="{ left: hover.squareLeft+'px', top: hover.squareTop+'px', zIndex: zIndex+13 }" />
+
+			<span ng-show="false" 
+				  style="position: absolute; left: -10px; top: 110px; color: #FFF; font-size: 10px; padding: 3px 10px; width: 100px; background-color: #000; opacity: 0.6;"
+				  ng-style="{ zIndex: zIndex+14 }"
+				  >{{ choosing.name + ' ' + choosing.x + ' ' + choosing.y }}</span>
+
+			<!-- Surface -->
+			<div ng-mousemove="hoverOverHover($event.offsetX, $event.offsetY)"
+				 ng-mouseleave="hover.hovering = false"
+				 ng-click="clickHover($event.offsetX, $event.offsetY)"
+				 ng-style="{ zIndex: zIndex+1000 }"
+				 style="position: absolute; left: 0px; top: 0px; width: 100px; height: 100px;"></div>
+		</div>
+	</div>
+</div>
