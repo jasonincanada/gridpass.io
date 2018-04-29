@@ -2,7 +2,7 @@
 body {
    background-color: #000;
    margin: 0px;
-   font-family: 'Verdana';
+   font-family: 'Open Sans', sans-serif;
 }
 
 input[type="text"] {
